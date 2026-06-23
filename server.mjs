@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(__dirname, "public");
+const ROOT = __dirname;
 const PORT = Number(process.env.PORT) || 8794;
 
 const MIME = {
@@ -18,10 +19,19 @@ const MIME = {
 };
 
 const server = http.createServer((req, res) => {
-  const urlPath = req.url === "/" ? "/index.html" : req.url.split("?")[0];
-  const filePath = path.join(PUBLIC, urlPath);
+  let urlPath = req.url === "/" ? "/index.html" : req.url.split("?")[0];
 
-  if (!filePath.startsWith(PUBLIC)) {
+  let filePath;
+  if (urlPath.startsWith("/data/")) {
+    filePath = path.join(ROOT, urlPath.slice(1));
+  } else if (urlPath === "/ALEXA-SETUP.html") {
+    filePath = path.join(ROOT, "ALEXA-SETUP.html");
+  } else {
+    filePath = path.join(PUBLIC, urlPath);
+  }
+
+  const allowedRoot = urlPath.startsWith("/data/") || urlPath === "/ALEXA-SETUP.html" ? ROOT : PUBLIC;
+  if (!filePath.startsWith(allowedRoot)) {
     res.writeHead(403);
     res.end("Forbidden");
     return;

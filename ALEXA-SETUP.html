@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alexa setup — My Morning Weather</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+    h1 { color: #0369a1; }
+    code, pre { background: #f1f5f9; padding: 0.2em 0.4em; border-radius: 6px; }
+    pre { padding: 1rem; overflow-x: auto; }
+    .url { font-size: 1.1rem; font-weight: bold; color: #0f766e; word-break: break-all; }
+    ol li { margin-bottom: 0.75rem; }
+    .note { background: #fef3c7; padding: 1rem; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>One-time Alexa setup (~5 min)</h1>
+  <p class="note">Your weather app URL (already wired into the skill code on disk):</p>
+  <p class="url" id="live-url">Loading…</p>
+
+  <ol>
+    <li>Open <a href="https://developer.amazon.com/alexa/console/ask" target="_blank">Alexa Developer Console</a> and sign in with your Amazon account.</li>
+    <li><strong>Create Skill</strong> → Name: <code>My Morning Weather</code> → Custom → Alexa-hosted (Node.js).</li>
+    <li><strong>Build</strong> → <strong>Interfaces</strong> → turn on <strong>Alexa Web API for Games</strong>.</li>
+    <li><strong>Build</strong> → <strong>Invocation</strong> → invocation name: <code>my morning weather</code>.</li>
+    <li><strong>Code</strong> tab → replace all code with the contents of <code>alexa-skill/index.js</code> in this folder (URL already set).</li>
+    <li>Click <strong>Deploy</strong> → set skill to <strong>Development</strong>.</li>
+    <li>Alexa app on phone → <strong>Skills &amp; Games</strong> → <strong>Your Skills</strong> → <strong>Dev</strong> → enable <strong>My Morning Weather</strong> on the Fire tablet.</li>
+  </ol>
+
+  <p>Test on tablet: <strong>"Alexa, open My Morning Weather"</strong></p>
+
+  <p><a id="preview" href="#" target="_blank">Open live app preview</a></p>
+
+  <script>
+    fetch('data/deploy-url.json').then(r => r.json()).then(j => {
+      document.getElementById('live-url').textContent = j.url;
+      document.getElementById('preview').href = j.url;
+    }).catch(() => {
+      document.getElementById('live-url').textContent = '(Run Start-MorningWeather-Service.ps1 first)';
+    });
+  </script>
+</body>
+</html>

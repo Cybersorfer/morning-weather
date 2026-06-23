@@ -1,12 +1,12 @@
-/**
+﻿/**
  * Alexa skill backend for "My Morning Weather"
- * Paste into Alexa Developer Console → Code tab (Node.js 18+ / ASK SDK v2)
+ * Paste into Alexa Developer Console â†’ Code tab (Node.js 18+ / ASK SDK v2)
  * OR deploy as AWS Lambda with skill endpoint.
  *
  * Before testing: set WEB_APP_URL to your HTTPS-hosted index.html
  */
 
-const WEB_APP_URL = process.env.WEB_APP_URL || "https://YOUR-USERNAME.github.io/morning-weather/";
+const WEB_APP_URL = process.env.WEB_APP_URL || "https://position-terrorist-spatial-occasionally.trycloudflare.com/";
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
@@ -107,3 +107,4 @@ exports.handler = async function (event, context) {
     .addErrorHandlers(ErrorHandler)
     .lambda()(event, context);
 };
+

@@ -1,3 +1,19 @@
+# One-time Alexa setup (~5 min) — open while signed into Amazon
+
+Double-click **`ALEXA-SETUP.html`** or run **`Setup-Everything.ps1`** (starts tunnel + opens console).
+
+**Already done for you (free, no accounts needed):**
+- App live on HTTPS via Cloudflare tunnel
+- Desktop shortcut: **My Morning Weather** (keeps server + tunnel running)
+- Alexa skill code pre-filled with live URL in `alexa-skill/index.js`
+- IP location fallback (works without GPS — verified with hands/eyes)
+
+**You only need to do once:** sign into [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask) and follow `ALEXA-SETUP.html` (copy-paste skill code, enable Dev skill on Fire tablet).
+
+Test: **"Alexa, open My Morning Weather"**
+
+---
+
 # My Morning Weather
 
 Kid-friendly daily weather and **what to wear** guide for your daughter's **Amazon Fire HD 10 Kids** tablet.

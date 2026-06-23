@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#38bdf8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Morning Weather">
+  <title>My Morning Weather</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-sky-300">
+  <div id="app-shell" class="app-bg min-h-screen bg-gradient-to-br from-sky-300 via-sky-200 to-cyan-100 text-sky-950">
+    <div id="loading-block" class="min-h-screen flex flex-col items-center justify-center px-6 text-center loading-pulse">
+      <div class="weather-hero-icon w-28 h-28 mb-6 opacity-90">
+        <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="14" fill="#FCD34D"/><g stroke="#F59E0B" stroke-width="3" stroke-linecap="round"><line x1="32" y1="6" x2="32" y2="14"/><line x1="32" y1="50" x2="32" y2="58"/><line x1="6" y1="32" x2="14" y2="32"/><line x1="50" y1="32" x2="58" y2="32"/></g></svg>
+      </div>
+      <p id="status-line" class="text-2xl font-extrabold">Getting ready…</p>
+      <p class="text-lg mt-2 opacity-75">Finding your weather</p>
+    </div>
+
+    <main id="main-content" class="hidden min-h-screen flex flex-col p-5 pb-8 max-w-5xl mx-auto">
+      <header class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <p id="greeting" class="text-xl font-bold opacity-90">Good morning</p>
+          <p id="place-name" class="text-base font-semibold opacity-75">Your location</p>
+        </div>
+        <button
+          id="speak-btn"
+          type="button"
+          class="shrink-0 flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/30 backdrop-blur font-bold text-base active:scale-95 transition-transform"
+          aria-label="Hear weather again"
+        >
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 11 19 19 15 19 9 11 5"/><path d="M7 9a4 4 0 000 6"/><path d="M4 7a7 7 0 000 10"/></svg>
+          Hear it
+        </button>
+      </header>
+
+      <section class="rounded-[2rem] bg-white/25 backdrop-blur border border-white/30 p-6 mb-5 shadow-lg">
+        <div class="flex items-center gap-5">
+          <div id="hero-icon" class="weather-hero-icon w-24 h-24 shrink-0"></div>
+          <div class="min-w-0">
+            <h1 id="weather-title" class="text-3xl sm:text-4xl font-black leading-tight">Loading…</h1>
+            <p id="weather-subtitle" class="text-lg font-bold opacity-85 mt-1">—</p>
+            <p class="mt-3 text-5xl font-black tracking-tight"><span id="current-temp">--</span><span class="text-3xl align-top">F</span></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-5">
+        <h2 class="text-xl font-extrabold mb-3 px-1">What to wear today</h2>
+        <div id="clothing-grid" class="flex flex-wrap gap-3 justify-center sm:justify-start"></div>
+      </section>
+
+      <section class="flex-1 min-h-0">
+        <h2 class="text-xl font-extrabold mb-3 px-1">Your day — morning to night</h2>
+        <div id="timeline-row" class="timeline-scroll flex gap-4 overflow-x-auto pb-2 -mx-1 px-1"></div>
+        <p class="text-sm font-semibold opacity-70 mt-3 px-1">Swipe to see evening and night →</p>
+      </section>
+
+      <footer class="mt-6 text-center text-sm font-semibold opacity-60">
+        Say <span class="font-black">"Alexa, open My Morning Weather"</span>
+      </footer>
+    </main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

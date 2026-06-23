@@ -1,0 +1,10 @@
+{
+  "name": "morning-weather",
+  "version": "1.0.0",
+  "description": "Kid-friendly daily weather & clothing guide for Alexa on Fire tablet",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "license": "ISC"
+}

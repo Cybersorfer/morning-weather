@@ -1,0 +1,32 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "my morning weather",
+      "intents": [
+        {
+          "name": "OpenWeatherIntent",
+          "samples": [
+            "open",
+            "show me the weather",
+            "what should I wear",
+            "clothing guide",
+            "today's weather",
+            "morning weather"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        }
+      ]
+    }
+  }
+}

@@ -16,6 +16,8 @@ Test: **"Alexa, open My Morning Weather"**
 
 # My Morning Weather
 
+Live app: https://cybersorfer.github.io/morning-weather/
+
 Kid-friendly daily weather and **what to wear** guide for your daughter's **Amazon Fire HD 10 Kids** tablet.
 
 She says **"Alexa, open My Morning Weather"** and a full-screen visual app opens: auto-detects location (home or travel), shows today's vibe in plain language, clothing pictures, and a **morning → night** timeline.

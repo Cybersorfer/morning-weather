@@ -6,7 +6,7 @@
  * Before testing: set WEB_APP_URL to your HTTPS-hosted index.html
  */
 
-const WEB_APP_URL = process.env.WEB_APP_URL || "https://position-terrorist-spatial-occasionally.trycloudflare.com/";
+const WEB_APP_URL = process.env.WEB_APP_URL || "https://cybersorfer.github.io/morning-weather/";
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {

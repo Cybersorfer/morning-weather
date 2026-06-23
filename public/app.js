@@ -85,7 +85,7 @@ export function classifyWeather(tempF, weatherCode) {
         { key: "rainBoots", label: "Boots" },
         { key: "umbrella", label: "Umbrella" },
       ],
-      speak: "It's stormy today! Wear your raincoat and boots, and stay safe inside if you can.",
+      speak: "There might be storms today. Let's wear a raincoat and boots, and play inside if we can.",
     };
   }
 
@@ -103,7 +103,7 @@ export function classifyWeather(tempF, weatherCode) {
         { key: "gloves", label: "Gloves" },
         { key: "snowBoots", label: "Snow boots" },
       ],
-      speak: "It's snowy today! Wear your warm coat, scarf, gloves, and snow boots.",
+      speak: "It's snowy and cozy! Grab your warm coat, scarf, gloves, and snow boots.",
     };
   }
 
@@ -120,7 +120,7 @@ export function classifyWeather(tempF, weatherCode) {
         { key: "rainBoots", label: "Rain boots" },
         { key: "umbrella", label: "Umbrella" },
       ],
-      speak: "It's a rainy day! Don't forget your raincoat, rain boots, and umbrella.",
+      speak: "It's rainy today! Remember your raincoat, rain boots, and your umbrella.",
     };
   }
 
@@ -138,7 +138,7 @@ export function classifyWeather(tempF, weatherCode) {
         { key: "sunglasses", label: "Sunglasses" },
         { key: "hat", label: "Sun hat" },
       ],
-      speak: "It's sunny and hot today! Wear a t-shirt, shorts, sunglasses, and a sun hat.",
+      speak: "It's sunny and hot! A t-shirt, shorts, sunglasses, and a sun hat would be perfect.",
     };
   }
 
@@ -155,7 +155,7 @@ export function classifyWeather(tempF, weatherCode) {
         { key: "jeans", label: "Jeans" },
         { key: "sneakers", label: "Sneakers" },
       ],
-      speak: "It's sunny but fresh today! A light long sleeve and jeans will feel just right.",
+      speak: "It's sunny but fresh! A light long sleeve and jeans should feel just right.",
     };
   }
 
@@ -172,7 +172,7 @@ export function classifyWeather(tempF, weatherCode) {
         { key: "leggings", label: "Leggings" },
         { key: "sneakers", label: "Sneakers" },
       ],
-      speak: "It's cloudy but warm today! A comfy shirt and leggings will work great.",
+      speak: "It's cloudy but warm! A comfy shirt and leggings will be great today.",
     };
   }
 
@@ -189,7 +189,7 @@ export function classifyWeather(tempF, weatherCode) {
         { key: "pants", label: "Warm pants" },
         { key: "sneakers", label: "Sneakers" },
       ],
-      speak: "It's cloudy and chilly today! Put on a cozy sweater and warm pants.",
+      speak: "It's cloudy and chilly! A cozy sweater and warm pants will keep you comfy.",
     };
   }
 
@@ -205,7 +205,7 @@ export function classifyWeather(tempF, weatherCode) {
       { key: "jeans", label: "Pants" },
       { key: "sneakers", label: "Sneakers" },
     ],
-    speak: "The weather looks okay today! A regular shirt and pants should be fine.",
+    speak: "The weather looks pretty nice! A regular shirt and pants should work great.",
   };
 }
 
@@ -267,16 +267,75 @@ function buildTimeline(hourly) {
   });
 }
 
+function buildSpeechLine(greetingText, state) {
+  return `${greetingText}, friend! Today looks like ${state.title.toLowerCase()}. ${state.speak}`;
+}
+
+function escapeForSsml(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function toKidSsml(text) {
+  return `<speak><amazon:domain name="conversational"><prosody rate="94%" pitch="+10%" volume="medium">${escapeForSsml(text)}</prosody></amazon:domain></speak>`;
+}
+
+/** @type {SpeechSynthesisVoice | null} */
+let cachedVoice = null;
+
+function scoreVoice(voice) {
+  const name = voice.name.toLowerCase();
+  let score = 0;
+  if (!voice.lang.toLowerCase().startsWith("en")) return -100;
+  if (/female|woman|girl/.test(name)) score += 40;
+  if (/jenny|aria|samantha|zira|hazel|susan|linda|victoria|emma|joanna|ivy|kendra|kimberly|salli/.test(name)) score += 50;
+  if (/neural|natural|online|premium/.test(name)) score += 35;
+  if (/google/.test(name) && /female|f/.test(name)) score += 30;
+  if (/microsoft/.test(name) && !/david|mark|guy|ryan|male/.test(name)) score += 15;
+  if (/male|david|mark|guy|ryan|george|james|brian/.test(name)) score -= 80;
+  if (voice.default && score < 20) score += 5;
+  if (voice.localService) score += 5;
+  return score;
+}
+
+function pickKidFriendlyVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  if (cachedVoice && voices.some((v) => v.name === cachedVoice.name)) return cachedVoice;
+  const ranked = [...voices].sort((a, b) => scoreVoice(b) - scoreVoice(a));
+  cachedVoice = ranked.find((v) => scoreVoice(v) > 0) || ranked.find((v) => v.lang.startsWith("en")) || voices[0];
+  return cachedVoice;
+}
+
+function loadVoices() {
+  return new Promise((resolve) => {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length) {
+      pickKidFriendlyVoice();
+      resolve(voices);
+      return;
+    }
+    window.speechSynthesis.onvoiceschanged = () => {
+      pickKidFriendlyVoice();
+      resolve(window.speechSynthesis.getVoices());
+    };
+    setTimeout(() => resolve(window.speechSynthesis.getVoices()), 500);
+  });
+}
+
 function speak(text) {
   if (alexaClient?.interface?.textToSpeech?.speak) {
-    alexaClient.interface.textToSpeech.speak(text);
+    alexaClient.interface.textToSpeech.speak(toKidSsml(text));
     return;
   }
+
   if ("speechSynthesis" in window) {
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
-    utter.rate = 0.92;
-    utter.pitch = 1.05;
+    const voice = pickKidFriendlyVoice();
+    if (voice) utter.voice = voice;
+    utter.rate = 0.9;
+    utter.pitch = 1.14;
+    utter.volume = 1;
     window.speechSynthesis.speak(utter);
   }
 }
@@ -360,7 +419,7 @@ function renderWeather(data, placeName) {
   renderClothing(currentState.clothing);
   renderTimeline(timeline);
 
-  const speech = `${greeting()}! Right now it's ${currentState.title.toLowerCase()}. ${currentState.speak}`;
+  const speech = buildSpeechLine(greeting(), currentState);
   document.getElementById("speak-btn").onclick = () => speak(speech);
   speak(speech);
 }
@@ -483,6 +542,7 @@ function loadAlexaScript() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadAlexaScript();
+  await loadVoices();
   initAlexa();
   initApp();
 });

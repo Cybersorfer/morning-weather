@@ -8,6 +8,14 @@
 
 const WEB_APP_URL = process.env.WEB_APP_URL || "https://cybersorfer.github.io/morning-weather/";
 
+function kidSpeak(text) {
+  const safe = String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return `<speak><amazon:domain name="conversational"><prosody rate="94%" pitch="+10%" volume="medium">${safe}</prosody></amazon:domain></speak>`;
+}
+
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return (
@@ -18,7 +26,7 @@ const LaunchRequestHandler = {
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak("Opening your morning clothing guide!")
+      .speak(kidSpeak("Hi friend! Opening your morning clothing guide."))
       .addDirective({
         type: "Alexa.Presentation.HTML.Start",
         data: {},
@@ -43,7 +51,7 @@ const OpenWeatherIntentHandler = {
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak("Here is your weather and outfit guide!")
+      .speak(kidSpeak("Here comes your weather and outfit guide!"))
       .addDirective({
         type: "Alexa.Presentation.HTML.Start",
         data: {},
@@ -66,7 +74,7 @@ const HtmlMessageHandler = {
   handle(handlerInput) {
     const message = handlerInput.requestEnvelope.request.message || {};
     if (message.type === "Speak" && message.text) {
-      return handlerInput.responseBuilder.speak(message.text).getResponse();
+      return handlerInput.responseBuilder.speak(kidSpeak(message.text)).getResponse();
     }
     return handlerInput.responseBuilder.getResponse();
   },
@@ -88,7 +96,7 @@ const ErrorHandler = {
   handle(handlerInput, error) {
     console.error(error);
     return handlerInput.responseBuilder
-      .speak("Sorry, something went wrong. Try again in a moment.")
+      .speak(kidSpeak("Oops, something went wrong. Let's try again in a moment."))
       .getResponse();
   },
 };

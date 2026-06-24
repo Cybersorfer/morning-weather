@@ -1,11 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/alexa.js", "use": "@vercel/node" },
-    { "src": "public/**", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/alexa", "dest": "/api/alexa.js" },
-    { "src": "/(.*)", "dest": "/public/$1" }
-  ]
+  "functions": {
+    "api/alexa.js": {
+      "maxDuration": 10
+    }
+  }
 }

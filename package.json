@@ -8,8 +8,6 @@
   },
   "license": "ISC",
   "dependencies": {
-    "ask-sdk-core": "^2.14.1",
-    "ask-sdk-express-adapter": "^2.14.1",
-    "express": "^4.21.2"
+    "ask-sdk-core": "^2.14.1"
   }
 }

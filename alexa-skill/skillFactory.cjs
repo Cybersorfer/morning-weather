@@ -94,8 +94,11 @@ function buildSkill(Alexa) {
       HtmlMessageHandler,
       SessionEndedHandler
     )
-    .addErrorHandlers(ErrorHandler)
-    .create();
+    .addErrorHandlers(ErrorHandler);
 }
 
-module.exports = { buildSkill, WEB_APP_URL, kidSpeak };
+function getLambdaHandler(Alexa) {
+  return buildSkill(Alexa).lambda();
+}
+
+module.exports = { buildSkill, getLambdaHandler, WEB_APP_URL, kidSpeak };

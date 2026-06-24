@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.MorningWeather" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#38BDF8</item>
+        <item name="android:statusBarColor">#38BDF8</item>
+    </style>
+    <style name="Theme.MorningWeather.Fullscreen" parent="Theme.MorningWeather" />
+</resources>

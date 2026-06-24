@@ -71,7 +71,7 @@ function isClearCode(code) {
  * @param {number} tempF
  * @param {number} weatherCode
  */
-export function classifyWeather(tempF, weatherCode) {
+function classifyWeather(tempF, weatherCode) {
   if (isStormCode(weatherCode)) {
     return {
       id: "stormy",
@@ -453,50 +453,130 @@ async function fetchWeather(lat, lon) {
   return res.json();
 }
 
-function getPosition(options) {
+function getPosition(options, timeoutMs = 8000) {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error("Geolocation not supported"));
       return;
     }
-    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+    const timer = setTimeout(() => reject(new Error("Geolocation timeout")), timeoutMs);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        clearTimeout(timer);
+        resolve(pos);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+      options
+    );
   });
 }
 
+async function fetchWithTimeout(url, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function resolveLocationFromNative() {
+  if (window.MorningWeatherNative?.getLocationJson) {
+    try {
+      const raw = window.MorningWeatherNative.getLocationJson();
+      if (raw && raw !== "null") {
+        const parsed = JSON.parse(raw);
+        if (parsed.lat && parsed.lon) {
+          return { lat: parsed.lat, lon: parsed.lon, source: "native" };
+        }
+      }
+    } catch {
+      /* fall through */
+    }
+  }
+  if (window.__nativeLoc?.lat && window.__nativeLoc?.lon) {
+    return {
+      lat: window.__nativeLoc.lat,
+      lon: window.__nativeLoc.lon,
+      source: "native",
+    };
+  }
+  return null;
+}
+
 async function resolveLocationByIp() {
-  const res = await fetch("https://ipwho.is/");
-  if (!res.ok) throw new Error("IP lookup failed");
-  const json = await res.json();
-  if (!json.success) throw new Error("IP lookup failed");
-  return {
-    lat: json.latitude,
-    lon: json.longitude,
-    source: "ip",
-    placeName: [json.city, json.region].filter(Boolean).join(", ") || "Near you",
-  };
+  const providers = [
+    async () => {
+      const res = await fetchWithTimeout("https://ipwho.is/");
+      const json = await res.json();
+      if (!json.success) throw new Error("ipwho failed");
+      return {
+        lat: json.latitude,
+        lon: json.longitude,
+        placeName: [json.city, json.region].filter(Boolean).join(", ") || "Near you",
+      };
+    },
+    async () => {
+      const res = await fetchWithTimeout("https://ipapi.co/json/");
+      const json = await res.json();
+      if (json.error) throw new Error("ipapi failed");
+      return {
+        lat: json.latitude,
+        lon: json.longitude,
+        placeName: [json.city, json.region].filter(Boolean).join(", ") || "Near you",
+      };
+    },
+  ];
+
+  for (const provider of providers) {
+    try {
+      const result = await provider();
+      return { ...result, source: "ip" };
+    } catch {
+      /* try next */
+    }
+  }
+  throw new Error("IP lookup failed");
 }
 
 async function resolveLocation() {
   setLoading("Finding where you are…");
 
+  const native = await resolveLocationFromNative();
+  if (native) return native;
+
   try {
-    const pos = await getPosition({ enableHighAccuracy: true, timeout: 12000, maximumAge: 120000 });
+    const pos = await getPosition({ enableHighAccuracy: true, maximumAge: 120000 }, 6000);
     return { lat: pos.coords.latitude, lon: pos.coords.longitude, source: "gps" };
   } catch {
-    setLoading("GPS unavailable — trying network location…");
+    setLoading("Trying network location…");
   }
 
   try {
-    const pos = await getPosition({ enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 });
+    const pos = await getPosition({ enableHighAccuracy: false, maximumAge: 600000 }, 5000);
     return { lat: pos.coords.latitude, lon: pos.coords.longitude, source: "network" };
   } catch {
-    setLoading("Using your area from the internet…");
+    setLoading("Using your area from Wi‑Fi…");
   }
 
   return resolveLocationByIp();
 }
 
 async function initApp() {
+  const watchdog = setTimeout(() => {
+    if (!document.getElementById("main-content").classList.contains("hidden")) return;
+    showError(
+      "This is taking too long",
+      "Check Wi‑Fi is on, then tap Try again. Location permission helps too."
+    );
+  }, 22000);
+
   try {
     const loc = await resolveLocation();
     setLoading("Checking today's weather…");
@@ -508,10 +588,19 @@ async function initApp() {
     console.error(err);
     showError(
       "We couldn't find your weather",
-      "Check Wi‑Fi and try again, or say: Alexa, open My Morning Weather."
+      "Turn on Wi‑Fi and location, then tap Try again."
     );
+  } finally {
+    clearTimeout(watchdog);
   }
 }
+
+window.setNativeLocation = (lat, lon) => {
+  window.__nativeLoc = { lat, lon };
+  if (document.getElementById("main-content")?.classList.contains("hidden")) {
+    initApp();
+  }
+};
 
 function initAlexa() {
   if (typeof Alexa === "undefined") return;

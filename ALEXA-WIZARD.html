@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alexa setup wizard — My Morning Weather</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; max-width: 680px; margin: 0 auto; padding: 1.5rem; background: #f0f9ff; color: #0c4a6e; }
+    h1 { font-size: 1.6rem; margin-bottom: 0.25rem; }
+    .sub { opacity: 0.8; margin-bottom: 1.5rem; }
+    .step { background: #fff; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; border: 2px solid #bae6fd; }
+    .step.done { border-color: #86efac; background: #f0fdf4; }
+    .step h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+    .step p { margin: 0.4rem 0; line-height: 1.5; }
+    .warn { background: #fef3c7; border: 2px solid #fcd34d; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; font-weight: 600; }
+    .ok { background: #dcfce7; border: 2px solid #86efac; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    button { background: #0284c7; color: #fff; border: none; border-radius: 10px; padding: 0.65rem 1.2rem; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; margin-right: 0.5rem; }
+    button:hover { background: #0369a1; }
+    button.secondary { background: #64748b; }
+    code { background: #e2e8f0; padding: 0.15em 0.4em; border-radius: 4px; }
+    .big { font-size: 1.15rem; font-weight: 800; color: #b45309; }
+  </style>
+</head>
+<body>
+  <h1>My Morning Weather — Alexa wizard</h1>
+  <p class="sub">Skill code is already on your clipboard. Check off each step.</p>
+
+  <div class="ok" id="clip">✅ Skill code copied — on the <strong>Code</strong> tab press <strong>Ctrl+V</strong> then <strong>Deploy</strong>.</div>
+
+  <div class="warn">
+    <span class="big">Hosting must be: Alexa-hosted (Node.js)</span><br>
+    NOT “Provision your own” (that needs AWS — you don’t have that account).
+  </div>
+
+  <div class="step" id="s1">
+    <h2>Step 1 — Create skill</h2>
+    <p>Developer Console → <strong>Create Skill</strong></p>
+    <p>Name: <code>My Morning Weather</code> · English (US) · <strong>Custom</strong></p>
+    <button type="button" onclick="openUrl('https://developer.amazon.com/alexa/console/ask')">Open console</button>
+    <button type="button" class="secondary" onclick="done('s1')">Done</button>
+  </div>
+
+  <div class="step" id="s2">
+    <h2>Step 2 — Hosting (critical)</h2>
+    <p>Choose: <strong>Alexa-hosted (Node.js)</strong></p>
+    <p>Template: <strong>Start from Scratch</strong> → Create skill</p>
+    <button type="button" class="secondary" onclick="done('s2')">Done — I see Code tab</button>
+  </div>
+
+  <div class="step" id="s3">
+    <h2>Step 3 — Interfaces</h2>
+    <p>Build → Assets → <strong>Interfaces</strong></p>
+    <p>Turn <strong>ON</strong>: Alexa Web API for Games · Save · Build Skill</p>
+    <button type="button" class="secondary" onclick="done('s3')">Done</button>
+  </div>
+
+  <div class="step" id="s4">
+    <h2>Step 4 — Invocation</h2>
+    <p>Build → <strong>Invocation</strong> → name: <code>my morning weather</code> → Save</p>
+    <button type="button" class="secondary" onclick="done('s4')">Done</button>
+  </div>
+
+  <div class="step" id="s5">
+    <h2>Step 5 — Paste code</h2>
+    <p>Top tab <strong>Code</strong> → select all in index.js → <strong>Ctrl+V</strong> → Save → <strong>Deploy</strong></p>
+    <button type="button" onclick="copyCode()">Copy code again</button>
+    <button type="button" class="secondary" onclick="done('s5')">Deployed</button>
+  </div>
+
+  <div class="step" id="s6">
+    <h2>Step 6 — Fire tablet</h2>
+    <p>Alexa app → Skills & Games → Your Skills → <strong>Dev</strong> → enable on tablet</p>
+    <p>Say: <strong>“Alexa, open My Morning Weather”</strong></p>
+    <button type="button" class="secondary" onclick="done('s6')">Done</button>
+  </div>
+
+  <script>
+    async function copyCode() {
+      try {
+        const res = await fetch('alexa-skill/index.js');
+        const text = await res.text();
+        await navigator.clipboard.writeText(text);
+        document.getElementById('clip').innerHTML = '✅ Code copied again!';
+      } catch {
+        alert('Open Setup-AlexaSkill.ps1 to copy from disk.');
+      }
+    }
+    function openUrl(u) { window.open(u, '_blank'); }
+    function done(id) {
+      document.getElementById(id).classList.add('done');
+    }
+  </script>
+</body>
+</html>

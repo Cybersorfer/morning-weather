@@ -6,8 +6,5 @@
   "scripts": {
     "start": "node server.mjs"
   },
-  "license": "ISC",
-  "dependencies": {
-    "ask-sdk-core": "^2.14.1"
-  }
+  "license": "ISC"
 }

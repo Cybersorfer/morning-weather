@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/alexa.js": {
-      "maxDuration": 10
-    }
-  }
-}

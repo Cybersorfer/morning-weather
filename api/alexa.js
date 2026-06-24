@@ -32,6 +32,11 @@ function emptyResponse() {
 }
 
 module.exports = (req, res) => {
+  if (req.method === "GET" || req.method === "HEAD") {
+    res.status(200).send("My Morning Weather Alexa endpoint is live.");
+    return;
+  }
+
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
